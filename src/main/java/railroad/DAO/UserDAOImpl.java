@@ -11,7 +11,6 @@ import java.util.Map;
 
 
 @Repository
-@Transactional
 public class UserDAOImpl extends GenericDAOImpl<User, Long> implements UserDAO {
 
     @Override

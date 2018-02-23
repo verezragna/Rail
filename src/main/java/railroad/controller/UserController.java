@@ -1,5 +1,7 @@
 package railroad.controller;
 
+import railroad.Responses.Response;
+import railroad.Responses.SuccessResponse;
 import railroad.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,29 +20,32 @@ public class UserController {
 
     @GetMapping("/{id}")
     public @ResponseBody
-    User getUser(@PathVariable Long id) {
-        return userService.find(id);
+    Response getUser(@PathVariable Long id) {
+
+        return new SuccessResponse(userService.find(id));
     }
 
     @GetMapping
     public @ResponseBody
-    List<User> getUserList() {
-        return userService.list();
+    Response getUserList() {
+        return new SuccessResponse(userService.list());
     }
 
     @PutMapping
-    public void updateUser(@RequestBody User user) {
+    public @ResponseBody Response updateUser(@RequestBody User user) {
         userService.save(user);
+        return new SuccessResponse(user.getId());
     }
 
     @PostMapping
-    public @ResponseBody
-    void createUser(@RequestBody User user) {
+    public @ResponseBody Response createUser(@RequestBody User user) {
         userService.save(user);
+        return new SuccessResponse(user.getId());
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public @ResponseBody Response deleteUser(@PathVariable Long id) {
         this.userService.remove(id);
+        return new SuccessResponse(id);
     }
 }

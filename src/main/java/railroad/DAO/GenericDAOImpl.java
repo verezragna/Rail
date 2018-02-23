@@ -1,5 +1,6 @@
 package railroad.DAO;
 
+import org.springframework.transaction.annotation.Transactional;
 import railroad.model.BaseEntity;
 
 import javax.persistence.EntityManager;
