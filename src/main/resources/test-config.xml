@@ -9,8 +9,8 @@
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
         http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-    <context:annotation-config />
-    <context:component-scan base-package="railroad" />
+    <context:annotation-config/>
+    <context:component-scan base-package="railroad"/>
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <bean id="mapperFactoryBean" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
@@ -19,31 +19,31 @@
                 <property name="serializationInclusion" value="NON_NULL"/>
             </bean>
         </property>
-        <property name="failOnEmptyBeans" value="false" />
+        <property name="failOnEmptyBeans" value="false"/>
     </bean>
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations" value="classpath:db.properties" />
+        <property name="locations" value="classpath:db.properties"/>
     </bean>
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="org.h2.Driver" />
-        <property name="url" value="jdbc:h2:mem:;INIT=RUNSCRIPT FROM 'classpath:/sql/create-db.sql'" />
+        <property name="driverClassName" value="org.h2.Driver"/>
+        <property name="url" value="jdbc:h2:mem:;INIT=RUNSCRIPT FROM 'classpath:/sql/create-db.sql'"/>
     </bean>
 
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="dataSource" ref="dataSource" />
+        <property name="dataSource" ref="dataSource"/>
         <property name="jpaVendorAdapter">
-            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
         </property>
-        <property name="packagesToScan" value="railroad.model" />
+        <property name="packagesToScan" value="railroad.model"/>
         <property name="persistenceProvider">
-            <bean class="org.hibernate.jpa.HibernatePersistenceProvider" />
+            <bean class="org.hibernate.jpa.HibernatePersistenceProvider"/>
         </property>
     </bean>
 
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="entityManagerFactory" />
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
 
 </beans>

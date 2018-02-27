@@ -15,7 +15,8 @@ import javax.persistence.PersistenceContext;
 @Transactional
 public abstract class BaseDaoTest {
 
-    @PersistenceContext protected EntityManager entityManager;
+    @PersistenceContext
+    protected EntityManager entityManager;
 
     @Before
     public void setUp() {

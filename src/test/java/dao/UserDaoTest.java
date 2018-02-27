@@ -3,15 +3,18 @@ package dao;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import railroad.DAO.UserDAO;
+import railroad.Exceptions.UserNotFoundException;
 import railroad.model.User;
 import railroad.model.enums.UserStatus;
+
 import java.util.*;
 
 import static org.junit.Assert.*;
 
 public class UserDaoTest extends BaseDaoTest {
 
-    @Autowired private UserDAO userDao;
+    @Autowired
+    private UserDAO userDao;
     private final Long correctId = 1L;
     private final Long incorrectId = -1L;
 
@@ -24,7 +27,11 @@ public class UserDaoTest extends BaseDaoTest {
 
     @Test
     public void findUserNotExistsReturnNull() {
-        assertNull("Value must be null", userDao.find(incorrectId));
+        try {
+            userDao.find(incorrectId);
+            fail();
+        } catch (UserNotFoundException e) {
+        }
     }
 
     @Test
@@ -65,7 +72,7 @@ public class UserDaoTest extends BaseDaoTest {
     private List<User> createUserList(int size, Long startId, UserStatus userStatus) {
         List<User> userList = new ArrayList<User>(size);
         for (int i = 0; i < size; i++) {
-            User user = new User(String.valueOf(startId+i), String.valueOf(startId+i), String.valueOf(startId+i), String.valueOf(startId+i), userStatus);
+            User user = new User(String.valueOf(startId + i), String.valueOf(startId + i), String.valueOf(startId + i), String.valueOf(startId + i), userStatus);
             user.setId(startId + i);
             userList.add(user);
         }

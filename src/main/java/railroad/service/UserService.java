@@ -9,7 +9,7 @@ public interface UserService {
 
     List<User> list();
 
-    void save(User user);
+    Long save(User user);
 
     User find(Long id);
 

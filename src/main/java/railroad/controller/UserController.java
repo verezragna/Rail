@@ -1,6 +1,9 @@
 package railroad.controller;
 
-import railroad.Responses.Response;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.http.ResponseEntity;
+import railroad.Exceptions.ApiException;
+import railroad.Responses.FailedResponse;
 import railroad.Responses.SuccessResponse;
 import railroad.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,43 +12,74 @@ import org.springframework.web.bind.annotation.*;
 import railroad.service.UserService;
 
 
-import java.util.List;
-
 @Controller
 @RequestMapping(value = "/api/users")
-public class UserController {
+public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
 
     @GetMapping("/{id}")
     public @ResponseBody
-    Response getUser(@PathVariable Long id) {
-
-        return new SuccessResponse(userService.find(id));
+    ResponseEntity getUser(@PathVariable Long id) throws JsonProcessingException {
+        try {
+            Object user = userService.find(id);
+            return user == null ? createSuccessResponse() : createSuccessResponse(user);
+        } catch (ApiException e) {
+            return createFailedResponse(e);
+        } catch (Exception e) {
+            return createInternalErrorResponse();
+        }
     }
 
     @GetMapping
     public @ResponseBody
-    Response getUserList() {
-        return new SuccessResponse(userService.list());
+    ResponseEntity getUserList() throws JsonProcessingException {
+        try {
+            return createSuccessResponse(userService.list());
+        } catch (ApiException ex) {
+            return createFailedResponse(ex);
+        } catch (Exception ex) {
+            return createInternalErrorResponse();
+        }
     }
 
     @PutMapping
-    public @ResponseBody Response updateUser(@RequestBody User user) {
-        userService.save(user);
-        return new SuccessResponse(user.getId());
+    public @ResponseBody
+    ResponseEntity updateUser(@RequestBody User user) throws JsonProcessingException {
+        try {
+            userService.save(user);
+            return createSuccessResponse();
+        } catch (ApiException ex) {
+            return createFailedResponse(ex);
+        } catch (Exception ex) {
+            return createInternalErrorResponse();
+        }
     }
 
     @PostMapping
-    public @ResponseBody Response createUser(@RequestBody User user) {
-        userService.save(user);
-        return new SuccessResponse(user.getId());
+    public @ResponseBody
+    ResponseEntity createUser(@RequestBody User user) throws JsonProcessingException {
+        try {
+            userService.save(user);
+            return createSuccessResponse(user.getId());
+        } catch (ApiException ex) {
+            return createFailedResponse(ex);
+        } catch (Exception ex) {
+            return createInternalErrorResponse();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public @ResponseBody Response deleteUser(@PathVariable Long id) {
-        this.userService.remove(id);
-        return new SuccessResponse(id);
+    public @ResponseBody
+    ResponseEntity deleteUser(@PathVariable Long id) throws JsonProcessingException {
+        try {
+            userService.remove(id);
+            return createSuccessResponse(id);
+        } catch (ApiException ex) {
+            return createFailedResponse(ex);
+        } catch (Exception ex) {
+            return createInternalErrorResponse();
+        }
     }
 }

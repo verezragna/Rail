@@ -1,14 +1,16 @@
 package railroad.Responses;
 
-public class SuccessResponse extends Response {
-    private Object status;
+public class SuccessResponse extends BaseResponse {
 
-    public SuccessResponse(Object status) {
+    private final Object result;
+
+    public SuccessResponse(Object result) {
         super(true);
-        this.status = status;
+        this.result = result;
     }
 
-    public Object getStatus() {
-        return status;
+    public Object getResult() {
+        return result;
     }
+
 }

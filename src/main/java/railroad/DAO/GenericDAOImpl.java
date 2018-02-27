@@ -1,10 +1,12 @@
 package railroad.DAO;
 
 import org.springframework.transaction.annotation.Transactional;
+import railroad.Exceptions.UserAlreadyExistsException;
 import railroad.model.BaseEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
@@ -21,9 +23,15 @@ public abstract class GenericDAOImpl<T extends BaseEntity<U>, U> {
     }
 
     public void save(T entity) {
-        if (entity.getId() == null) {
-            entityManager.persist(entity);
-        } else { entityManager.merge(entity);}
+        try {
+            if (entity.getId() == null) {
+                entityManager.persist(entity);
+            } else {
+                entityManager.merge(entity);
+            }
+        } catch (PersistenceException e) {
+            throw new UserAlreadyExistsException();
+        }
     }
 
     public List<T> list() {
@@ -43,7 +51,7 @@ public abstract class GenericDAOImpl<T extends BaseEntity<U>, U> {
         removeModel(entity);
     }
 
-    protected void executeNamedQuery(String name, Map<String,Object> params){
+    protected void executeNamedQuery(String name, Map<String, Object> params) {
         Query query = entityManager.createNamedQuery(name);
         params.forEach(query::setParameter);
         query.executeUpdate();

@@ -11,6 +11,10 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import railroad.Exceptions.ApiException;
+import railroad.Exceptions.UserAlreadyExistsException;
+import railroad.Exceptions.UserNotFoundException;
+import railroad.Responses.FailedResponse;
 import railroad.Responses.SuccessResponse;
 import railroad.controller.UserController;
 import railroad.model.User;
@@ -32,8 +36,11 @@ import static org.mockito.ArgumentMatchers.any;
 
 public class UserControllerTest extends BaseControllerTest {
 
-    @InjectMocks @Autowired private UserController userController;
-    @Mock private UserService userService;
+    @InjectMocks
+    @Autowired
+    private UserController userController;
+    @Mock
+    private UserService userService;
 
     private final Long correctId = 1L;
     private final Long incorrectId = -1L;
@@ -54,19 +61,22 @@ public class UserControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.status.id", is(1)));
+                .andExpect(jsonPath("$.result.id", is(1)));
         verify(userService, times(1)).find(any(Long.class));
     }
 
-    /*@Test
-    public void findUserNotExistsReturnSuccessResponseWithEmptyUser() throws Exception {
-        when(userService.find(incorrectId)).thenReturn(null);
+    @Test
+    public void findUserNonExistsReturnFailedResponseWithFalseStatus() throws Exception {
+        when(userService.find(incorrectId)).thenThrow(new UserNotFoundException());
 
-        mockMvc.perform(get("/users/{id}", incorrectId))
+        mockMvc.perform(get("/api/users/{id}", incorrectId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(content().bytes(objectMapper.writeValueAsBytes(new BaseResponse(true))));
-    }*/
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.code", is("USER_NOT_FOUND")))
+                .andExpect(jsonPath("$.message", is("User doesn't exist!")));
+        verify(userService, times(1)).find(any(Long.class));
+    }
 
     @Test
     public void findListUsersExistReturnSuccessResponseWithUserList() throws Exception {
@@ -78,29 +88,13 @@ public class UserControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.status", hasSize(2)))
-                .andExpect(jsonPath("$.status[0].id", is(1)))
-                .andExpect(jsonPath("$.status[1].id", is(2)));
+                .andExpect(jsonPath("$.result", hasSize(2)))
+                .andExpect(jsonPath("$.result[0].id", is(1)))
+                .andExpect(jsonPath("$.result[1].id", is(2)));
 
         verify(userService, times(1)).list();
         verifyNoMoreInteractions(userService);
     }
-
-    /*@Test
-    public void updateUserExistsReturnSuccessResponseWithUpdatedUser() throws Exception {
-        User User = createUser(1L);
-        UserDto userDto = createUserDto(1L);
-        userDto.setLogin("newLogin");
-
-        when(userService.update(map(userDto, User.class))).thenReturn(User);
-
-        mockMvc.perform(put("/users/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(userDto)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(content().bytes(objectMapper.writeValueAsBytes(new SuccessResponse(map(User, User.class)))));
-    }*/
 
     @Test
     public void createUserTest() throws Exception {
@@ -113,11 +107,26 @@ public class UserControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.status", is(1)));
+                .andExpect(jsonPath("$.result", is(1)));
 
         verify(userService, times(1)).save(any(User.class));
     }
 
+    @Test
+    public void createUserWithExistLoginTest() throws Exception {
+        User user = createUser(1L);
+        when(userService.save(user)).thenReturn(1L);
+        String userJsonStr = new ObjectMapper().writeValueAsString(user);
+        when(userService.save(user)).thenThrow(new UserAlreadyExistsException());
+        mockMvc.perform(
+                post("/api/users/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userJsonStr))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.code", is("USER_ALREADY_EXISTS")));
+    }
 
     @Test
     public void removeUserExistsReturnSuccessResponse() throws Exception {
@@ -125,10 +134,43 @@ public class UserControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.status", is(1)));
+                .andExpect(jsonPath("$.result", is(1)));
 
         verify(userService, times(1)).remove(any(Long.class));
         verifyNoMoreInteractions(userService);
+    }
+
+    @Test
+    public void updateUserWithExistLoginTest() throws Exception {
+        User user = createUser(1L);
+        when(userService.save(user)).thenReturn(1L);
+        String userJsonStr = new ObjectMapper().writeValueAsString(user);
+        when(userService.save(user)).thenThrow(new UserAlreadyExistsException());
+        mockMvc.perform(
+                put("/api/users/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userJsonStr))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.code", is("USER_ALREADY_EXISTS")));
+    }
+
+    @Test
+    public void updateUserTest() throws Exception {
+        User user = createUser(1L);
+        when(userService.save(user)).thenReturn(1L);
+        user.setFirst_name("Test2");
+        String userJsonStr = new ObjectMapper().writeValueAsString(user);
+        mockMvc.perform(
+                put("/api/users/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userJsonStr))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.success", is(true)));
+
+        verify(userService, times(1)).save(any(User.class));
     }
 
     private User createUser(Long id) {

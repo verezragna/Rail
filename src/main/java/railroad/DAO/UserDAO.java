@@ -11,7 +11,7 @@ public interface UserDAO {
 
     User find(Long id);
 
-    void remove(Long id,UserStatus userStatus);
+    void remove(Long id, UserStatus userStatus);
 
     List<User> list();
 }

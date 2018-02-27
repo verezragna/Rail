@@ -1,15 +1,24 @@
 package railroad.Responses;
 
-public class FailedResponse extends Response {
-    private String status;
+import railroad.Exceptions.ApiException;
 
-    public FailedResponse(String exceptionMessage){
+public class FailedResponse extends BaseResponse {
+
+    private final String code;
+    private final String message;
+
+    public FailedResponse(ApiException apiException) {
         super(false);
-        this.status = exceptionMessage;
-
+        this.code = apiException.getCode();
+        this.message = apiException.getMessage();
     }
 
-    public String getStatus() {
-        return status;
+    public String getCode() {
+        return code;
     }
+
+    public String getMessage() {
+        return message;
+    }
+
 }

@@ -1,6 +1,8 @@
 package railroad.DAO;
 
 import org.springframework.transaction.annotation.Transactional;
+import railroad.Exceptions.ApiException;
+import railroad.Exceptions.UserNotFoundException;
 import railroad.model.User;
 import org.springframework.stereotype.Repository;
 import railroad.model.enums.UserStatus;
@@ -25,7 +27,10 @@ public class UserDAOImpl extends GenericDAOImpl<User, Long> implements UserDAO {
 
     @Override
     public User find(Long id) {
-        return super.find(id);
+        User user = super.find(id);
+        if (user == null) {
+            throw new UserNotFoundException();
+        } else return user;
     }
 
     @Override
