@@ -1,8 +1,11 @@
 package railroad.model;
 
+import railroad.model.enums.UserRoles;
 import railroad.model.enums.UserStatus;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Table(name = "users")
 @Entity
@@ -25,6 +28,9 @@ public class User extends BaseEntity<Long> {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "roles_link", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<UserRoles> userRole = new HashSet<>();
 
     public User() {
     }
@@ -83,6 +89,14 @@ public class User extends BaseEntity<Long> {
 
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public Set<UserRoles> getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(Set<UserRoles> userRole) {
+        this.userRole = userRole;
     }
 
     @Override

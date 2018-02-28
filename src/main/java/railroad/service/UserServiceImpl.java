@@ -37,7 +37,6 @@ public class UserServiceImpl extends BaseService<Long, User> implements UserServ
         if (user == null) {
             user = userDAO.find(id);
             putEntity(user.getId(), user);
-            System.out.println("cached: " + id);
         }
         return user;
     }
@@ -48,7 +47,6 @@ public class UserServiceImpl extends BaseService<Long, User> implements UserServ
         if (user != null) {
             user.setStatus(UserStatus.DELETED);
             putEntity(id, user);
-            System.out.println("Cached: " + id);
         }
     }
 }
