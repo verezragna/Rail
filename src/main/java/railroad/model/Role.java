@@ -3,14 +3,14 @@ package railroad.model;
 import railroad.model.enums.UserRoles;
 
 import javax.persistence.*;
-import java.util.Set;
 
-@Entity
 @Table(name = "roles")
+@Entity
 public class Role extends BaseEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "name")

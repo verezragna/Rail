@@ -28,7 +28,7 @@ public class User extends BaseEntity<Long> {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private UserStatus status;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, targetEntity = Role.class)
     @JoinTable(name = "roles_link", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<UserRoles> userRole = new HashSet<>();
 

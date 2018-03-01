@@ -9,26 +9,18 @@
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
         http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
-    <context:annotation-config/>
-    <context:component-scan base-package="railroad"/>
+    <context:component-scan base-package="railroad.*"/>
     <tx:annotation-driven transaction-manager="transactionManager"/>
-
-    <bean id="mapperFactoryBean" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean">
-        <property name="objectMapper">
-            <bean class="com.fasterxml.jackson.databind.ObjectMapper">
-                <property name="serializationInclusion" value="NON_NULL"/>
-            </bean>
-        </property>
-        <property name="failOnEmptyBeans" value="false"/>
-    </bean>
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations" value="classpath:db.properties"/>
     </bean>
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="org.h2.Driver"/>
-        <property name="url" value="jdbc:h2:mem:;INIT=RUNSCRIPT FROM 'classpath:/sql/create-db.sql'"/>
+        <property name="driverClassName" value="${h2.driver}"/>
+        <property name="url" value="${h2.url}"/>
+        <property name="username" value="${h2.username}"/>
+        <property name="password" value="${h2.password}"/>
     </bean>
 
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
@@ -36,9 +28,15 @@
         <property name="jpaVendorAdapter">
             <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
         </property>
-        <property name="packagesToScan" value="railroad.model"/>
-        <property name="persistenceProvider">
-            <bean class="org.hibernate.jpa.HibernatePersistenceProvider"/>
+        <property name="packagesToScan" value="railroad.*"/>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.archive.autodetection">${hibernate.archive.autodetection}</prop>
+                <prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+                <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+                <prop key="hibernate.hbm2ddl.import_files">sql/create-db.sql</prop>
+            </props>
         </property>
     </bean>
 
