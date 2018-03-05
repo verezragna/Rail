@@ -1,6 +1,5 @@
 package railroad.DAO;
 
-import org.springframework.transaction.annotation.Transactional;
 import railroad.Exceptions.UserAlreadyExistsException;
 import railroad.model.BaseEntity;
 
@@ -57,5 +56,14 @@ public abstract class GenericDAOImpl<T extends BaseEntity<U>, U> {
         query.executeUpdate();
         entityManager.flush();
         entityManager.clear();
+    }
+
+    protected List<T> executeLoginQuery(String name, Map<String, Object> params) {
+        Query query = entityManager.createNamedQuery(name);
+        params.forEach(query::setParameter);
+        List<T> users = query.getResultList();
+        entityManager.flush();
+        entityManager.clear();
+        return users;
     }
 }

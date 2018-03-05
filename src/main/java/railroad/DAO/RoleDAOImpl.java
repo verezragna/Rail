@@ -1,10 +1,7 @@
 package railroad.DAO;
 
-import org.springframework.transaction.annotation.Transactional;
-import railroad.Exceptions.ApiException;
 import railroad.Exceptions.UserNotFoundException;
 import railroad.model.Role;
-import railroad.model.User;
 import org.springframework.stereotype.Repository;
 import railroad.model.enums.UserStatus;
 

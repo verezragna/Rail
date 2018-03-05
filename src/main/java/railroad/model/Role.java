@@ -20,6 +20,10 @@ public class Role extends BaseEntity<Long> {
     public Role() {
     }
 
+    public Role( UserRoles userRole){
+        this.userRole = userRole;
+    }
+
     public Long getId() {
         return id;
     }

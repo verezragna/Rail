@@ -20,7 +20,7 @@
             <column name="login" type="varchar(50)">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="password" type="binary(32)">
+            <column name="password" type="binary(60)">
                 <constraints nullable="false"/>
             </column>
             <column name="status" type="varchar(50)">

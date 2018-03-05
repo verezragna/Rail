@@ -1,37 +1,45 @@
 package railroad.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 import railroad.Exceptions.ApiException;
-import railroad.Responses.FailedResponse;
-import railroad.Responses.SuccessResponse;
 import railroad.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import railroad.service.UserService;
 
+import java.security.Principal;
 
-@Controller
-@RequestMapping(value = "/api/users")
+
+@RestController
+@EnableAspectJAutoProxy
+@RequestMapping("/api/users")
 public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
 
+    @PreAuthorize("hasAnyAuthority('GUEST', 'ADMIN')")
     @GetMapping("/{id}")
     public @ResponseBody
     ResponseEntity getUser(@PathVariable Long id) throws JsonProcessingException {
         try {
             Object user = userService.find(id);
             return user == null ? createSuccessResponse() : createSuccessResponse(user);
-        } catch (ApiException e) {
-            return createFailedResponse(e);
-        } catch (Exception e) {
-            return createInternalErrorResponse();
+        } catch (ApiException ex) {
+            return createFailedResponse(ex);
+        } catch (Exception ex) {
+            return createInternalErrorResponse(ex);
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('GUEST', 'ADMIN')")
     @GetMapping
     public @ResponseBody
     ResponseEntity getUserList() throws JsonProcessingException {
@@ -40,10 +48,11 @@ public class UserController extends BaseController {
         } catch (ApiException ex) {
             return createFailedResponse(ex);
         } catch (Exception ex) {
-            return createInternalErrorResponse();
+            return createInternalErrorResponse(ex);
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('GUEST', 'ADMIN')")
     @PutMapping
     public @ResponseBody
     ResponseEntity updateUser(@RequestBody User user) throws JsonProcessingException {
@@ -53,10 +62,11 @@ public class UserController extends BaseController {
         } catch (ApiException ex) {
             return createFailedResponse(ex);
         } catch (Exception ex) {
-            return createInternalErrorResponse();
+            return createInternalErrorResponse(ex);
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('GUEST', 'ADMIN')")
     @PostMapping
     public @ResponseBody
     ResponseEntity createUser(@RequestBody User user) throws JsonProcessingException {
@@ -66,10 +76,11 @@ public class UserController extends BaseController {
         } catch (ApiException ex) {
             return createFailedResponse(ex);
         } catch (Exception ex) {
-            return createInternalErrorResponse();
+            return createInternalErrorResponse(ex);
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('GUEST', 'ADMIN')")
     @DeleteMapping("/{id}")
     public @ResponseBody
     ResponseEntity deleteUser(@PathVariable Long id) throws JsonProcessingException {
@@ -79,7 +90,16 @@ public class UserController extends BaseController {
         } catch (ApiException ex) {
             return createFailedResponse(ex);
         } catch (Exception ex) {
-            return createInternalErrorResponse();
+            return createInternalErrorResponse(ex);
         }
     }
+
+    @RequestMapping("/login")
+    public ModelAndView hello(ModelMap model, Principal principal) {
+
+        String loggedInUserName=principal.getName();
+
+        return new ModelAndView("hello", "userName", loggedInUserName);
+    }
+
 }

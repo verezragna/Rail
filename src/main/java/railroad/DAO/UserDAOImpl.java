@@ -1,7 +1,5 @@
 package railroad.DAO;
 
-import org.springframework.transaction.annotation.Transactional;
-import railroad.Exceptions.ApiException;
 import railroad.Exceptions.UserNotFoundException;
 import railroad.model.User;
 import org.springframework.stereotype.Repository;
@@ -18,6 +16,13 @@ public class UserDAOImpl extends GenericDAOImpl<User, Long> implements UserDAO {
     @Override
     public List<User> list() {
         return super.list();
+    }
+
+    @Override
+    public User findByLogin(String login) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("login", login);
+        return super.executeLoginQuery("getByLogin", params).get(0);
     }
 
     @Override

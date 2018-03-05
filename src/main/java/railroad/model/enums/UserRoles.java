@@ -3,6 +3,6 @@ package railroad.model.enums;
 public enum UserRoles {
     ADMIN,
     GUEST,
-    MANAGER,
+    USER,
     OPERATOR
 }
