@@ -22,7 +22,7 @@ public class BaseController {
         return new ResponseEntity<FailedResponse>(new FailedResponse(ex), HttpStatus.OK);
     }
 
-    ResponseEntity createInternalErrorResponse() {
-        return new ResponseEntity<FailedResponse>(new FailedResponse(new InternalServerErrorException()), HttpStatus.OK);
+    ResponseEntity createInternalErrorResponse(Exception ex) {
+        return new ResponseEntity<FailedResponse>(new FailedResponse(new InternalServerErrorException(ex)), HttpStatus.OK);
     }
 }

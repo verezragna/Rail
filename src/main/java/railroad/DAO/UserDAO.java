@@ -14,4 +14,6 @@ public interface UserDAO {
     void remove(Long id, UserStatus userStatus);
 
     List<User> list();
+
+    User findByLogin(String login);
 }

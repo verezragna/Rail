@@ -1,13 +1,17 @@
 package railroad.model;
 
+import railroad.model.enums.UserRoles;
 import railroad.model.enums.UserStatus;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Table(name = "users")
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "changeUserStatus", query = "update User set status = :status where id = :id")
+        @NamedQuery(name = "changeUserStatus", query = "update User set status = :status where id = :id"),
+        @NamedQuery(name = "getByLogin", query = "SELECT u from User u where login = :login")
 })
 public class User extends BaseEntity<Long> {
 
@@ -25,6 +29,9 @@ public class User extends BaseEntity<Long> {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+    @ManyToMany(fetch = FetchType.EAGER, targetEntity = Role.class)
+    @JoinTable(name = "roles_link", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> userRole = new HashSet<>();
 
     public User() {
     }
@@ -83,6 +90,14 @@ public class User extends BaseEntity<Long> {
 
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public Set<Role> getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(Set<Role> userRole) {
+        this.userRole = userRole;
     }
 
     @Override
